@@ -32,6 +32,20 @@ body {
   margin: auto;
 }
 
+#Q {
+  font-weight: bold;
+}
+
+#images{
+  height: 325px;
+  width: auto;
+}
+
+h2, h3, h4, h5 {
+  font-weight: 700;
+  font-size: 15pt;
+}
+
 h1 {
   font-weight: 800;
 }
