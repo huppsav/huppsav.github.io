@@ -70,9 +70,8 @@ void loop() {
   delay(500);
 	if (sensorValue > 650) { // if sensor value is about 650 (lights off/dark so high voltage)
   // in case the sensor value is outside the range seen during calibration
-
-  // apply the calibration to the sensor reading
   sensorValue = constrain(sensorValue, sensorMin, sensorMax);
+  // apply the calibration to the sensor reading
   sensorValue = map(sensorValue, sensorMin, sensorMax, 0, 255);
   Serial.print("The analog version is ");
   Serial.print(sensorValue); 
@@ -104,17 +103,27 @@ void loop() {
       <h5>Additional Questions</h5>
       <p id="Q">Q1: In your voltage divider, can the variable resistor be either R1 or R2 or does
         it need to be one or the other? Justify your answer with example calculations</p>
-        <img src="" id="images">
-        <p></p> 
+        <p>It doesn't matter if the variable resistor is R1 or R2, but you will get different output voltages for placing the variable resistor as R1 or R2 so depending on what you want the output value to be, it would matter. 
+          For example if the photoresistor is in the dark, its resistance would be 100,00 ohms (value taken from the graph on L4 slides) so if we put that as either R1 or R2 then the voltage outputted would be very different for both.
+          If R2 was the variable resistor then it would output a higher voltage compared to if it were R1 which would output a very low voltage. So it could be either R1 or R2, but if you needed/wanted a higher voltage output
+          then you would have to put the variable resistor as R2. Below is the calculations
+          for the variable resistor in a ark setting being either R1 or R2. 
+        </p> 
+        <img src="q1_A3.jpg" id="images">
       <p id="Q">Q2: Draw a graph where the x-axis is time and the y-axis is voltage.
         Plot the voltage at V-measure of your voltage divider of your shared gif.</p>
-      <img src="" id="images">
-      <p> </p>
+      <img src="q2_A3.jpg" id="images">
+      <p>When my resistor was dark (at seconds 2-3 and 5-6) the voltage was 4.54 V which was calculated above for question 1 where 
+        the variable resistor was R2. When there was light (seconds 0-1, 3-4), the voltage was 0. 
+      </p>
       <p id="Q">Q3:AnalogWrite and analogRead are respectively 8-bit and 10-bit values.
         Imagine you had 10-bit PWM and a 16-bit analog-to-digital converter instead. How would this change your map() code?
         Explain your answer.</p>
-        <img src="" id="images">
-        <p></p> 
+        <p>The current range for a 8-bit AnalogWrite is 0-255, while a 10-bit AnalogRead is 0-1024. If we changed to a 10 bit AnalogRead
+          the range would change to 0-1023 while the 16-bit would be 0-65536. This would change our map() code because the map code currently maps to the range of 0-255, 
+          however with the higher bit values, the mapping range would need to increase to 0-1023 to account for the increase of reading ranges for an increased 
+          bit value for AnalogRead and AnalogWrite. 
+        </p> 
     </div>
   </body>
 </html>
