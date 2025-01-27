@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+
+    <title>Example Student's HCDE 439 Physical Computing Page!</title>
+
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>Assignment 3: Input Output!</h1>
+    <div class="header">
+      <img src="circut_board_A3.jpg" id="images"/>
+      <p>Below is all the documentation for assignment 3!
+        To my left is my circut board</p>
+    </div>
+    <div>
+      <h2>My Schematic:</h2>
+      <img src="schematic_A3.jpg" id="images">
+      <p>For my schematic, the first one on the left represents the schematic for the photoresistor.
+        For that, I used a resistor of 10k because we were told it's best practice to use large resistors for 
+        things such as buttons, photoresistors, etc...For my pins 11, 10, 9, I used a 100 resistor for the blue LED, and 220 resistor for the red and green
+        LEDS. I chose that based off my calculations below and chose the ones closest to my calculations
+        values. </p>
+      <img src="resistor_work_a2.jpg" id="images">
+      <h3>My Firmware:</h3>
+
+      <pre><code>
+const int sensorPin = A0;  // pin that the sensor is attached to
+
+int sensorValue = 0;   // the sensor value
+int sensorMin = 1023;  // minimum sensor value
+int sensorMax = 0;  // max sensor value
+
+void setup()
+{
+  pinMode(9, OUTPUT); //setting red LED
+  pinMode(11, OUTPUT); // setting white LED
+  pinMode(10, OUTPUT); //setting blue LED
+  Serial.begin(9600); // set data rate
+  
+  digitalWrite(9, HIGH);
+
+  // calibrate during the first three seconds
+  while (millis() < 3000) {
+    sensorValue = analogRead(sensorPin); // reads the voltage of sensor (number between 0 and 1023)
+
+    // record the maximum sensor value
+    if (sensorValue > sensorMax) {
+      sensorMax = sensorValue;
+    }
+
+    // record the minimum sensor value
+    if (sensorValue < sensorMin) {
+      sensorMin = sensorValue;
+    }
+  }
+  // signal the end of the calibration period
+  digitalWrite(10, LOW); // turn off blue LED
+  digitalWrite(11, LOW); // turn off white LED
+  digitalWrite(9, LOW); // turn off red LED
+}
+
+void loop() {
+  sensorValue = analogRead(sensorPin); // reads the voltage of sensor (number between 0 and 1023)
+  Serial.print("My sensor value is "); 
+  Serial.print(sensorValue); 
+  Serial.println();
+  delay(500);
+	if (sensorValue > 650) { // if sensor value is about 650 (lights off/dark so high voltage)
+  // in case the sensor value is outside the range seen during calibration
+
+  // apply the calibration to the sensor reading
+  sensorValue = constrain(sensorValue, sensorMin, sensorMax);
+  sensorValue = map(sensorValue, sensorMin, sensorMax, 0, 255);
+  Serial.print("The analog version is ");
+  Serial.print(sensorValue); 
+  Serial.println();
+  
+  // fade the LED using the calibrated value:
+    analogWrite(10, sensorValue-20); // fade blue LED with sensor value (between 0 and 255) 
+    analogWrite(11, sensorValue); // fade white LED with sensor value (between 0 and 255) 
+    analogWrite(9, sensorValue); //fade red LED with sensor value (between 0 and 255) 
+    } else { // if lights are on turn off all LEDS 
+      digitalWrite(10, LOW); // turn off blue
+      digitalWrite(11, LOW); // turn off white
+      digitalWrite(9, LOW); // turn off red
+  }
+}
+  </code></pre>
+      <p>In my code, in the setup there is a calibration period where the photoresistor picks up values
+        to get a sense for high and low lighting in my current setting. Once that period is over, it'll check the voltage 
+        reading from the sensor, and if it's dark (my finger covering the sensor) then the LEDS will turn on,
+        if it's light (I remove my finger) the LEDS will turn off. </p>
+        <p>An example output from my code would be "my sensor value is 747" (line break) "The modifed value is 180"</p>
+      <h4>My Circut's operation:</h4>
+      <img src="circut_A3_gif.gif" id="images">
+      <p>When I cover the sensor with my finger all red, blue, and green LEDS in the rgb will turn on, turning
+        the LED into what looks like a white light. When I remove my finger, all the LEDS will turn off.
+      </p>
+    </div>
+    <div>
+      <h5>Additional Questions</h5>
+      <p id="Q">Q1: In your voltage divider, can the variable resistor be either R1 or R2 or does
+        it need to be one or the other? Justify your answer with example calculations</p>
+        <img src="" id="images">
+        <p></p> 
+      <p id="Q">Q2: Draw a graph where the x-axis is time and the y-axis is voltage.
+        Plot the voltage at V-measure of your voltage divider of your shared gif.</p>
+      <img src="" id="images">
+      <p> </p>
+      <p id="Q">Q3:AnalogWrite and analogRead are respectively 8-bit and 10-bit values.
+        Imagine you had 10-bit PWM and a 16-bit analog-to-digital converter instead. How would this change your map() code?
+        Explain your answer.</p>
+        <img src="" id="images">
+        <p></p> 
+    </div>
+  </body>
+</html>
