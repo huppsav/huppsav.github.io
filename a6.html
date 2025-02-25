@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+
+    <title>Example Student's HCDE 439 Physical Computing Page!</title>
+
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>Assignment 6: Talking to the web!</h1>
+    <div class="header">
+      <img src="circut_A6.jpg" id="images"/>
+      <p>Below is all the documentation for assignment 5!
+        To my left is my circut board</p>
+    </div>
+    <div>
+      <h2>My Schematic:</h2>
+      <img src="schemaic_A6.jpg" id="images">
+      <p> In my schematic, I drew a joystick and the rgb LED. I kepy my current at 20mA so I used a 100 resistor for the 
+        blue LED and then 220 for the green and red to keep them all under 20 mA.My work for blue LEd would be 5V-3.2V = 20mA *R. 1.7V/.020 = 85 R. For <thead>
+          red and green LED it would be 5V-1.8V = 20mA*R. 3.2V/0.020A = 160R.
+        </thead>
+      </p>
+      <h3>My p5 code:</h3>
+      <pre><code> 
+const BAUD_RATE = 19200; // the baud rate in your Arduino sketch
+let joystickX, joystickY, port, connectBtn; // global variables
+
+let xPin = 0; // xpin of joystick
+let yPin = 0; // y pin of joystick
+
+function setup() {
+  setupSerial();
+  createCanvas(1900, 1900); // make canvas size of my laptop
+  background(255,255,255); //white background
+
+}
+
+function draw() {
+  const portIsOpen = checkPort(); // Check whether the port is open (see checkPort function below)
+  if (!portIsOpen) return; // If the port is not open, exit the draw loop
+  let str = port.readUntil("\n"); // Read from the port until the newline
+  if (str.length == 0) return; // If we didn't read anything, return.
+  let joystickArray = str.trim().split(","); // currently xval, yval -> splits each up 
+
+  joystickX = joystickArray[0]; //xval
+  joystickY= joystickArray[1]; // yval
+  
+  // Check joystick movement
+  if (joystickX == 0 && joystickX < 510) { // if x joystick is at coordinate 0 and under 510 do action
+    background("mediumpurple"); // turn background purple
+    textSize(100); //text size
+    text(`Joystick is moving up`,800, 500); // add text to canvas
+
+  } else if (joystickX == 1023 && joystickX > 510) { // if x joystick is at coordinate 1023 and above 510 do action
+    background("red"); // turn background red
+    textSize(100); // text size
+    text(`Joystick is moving down`,800, 500); // add text to canvas
+
+  } else {
+    background(255, 255, 255); //background white
+  }
+
+}
+
+// helper methods taken from class examples. Sets up the port for running code
+function setupSerial() {
+  port = createSerial();
+
+  // Check to see if there are any ports we have used previously
+  let usedPorts = usedSerialPorts();
+  if (usedPorts.length > 0) {
+    // If there are ports we've used, open the first one
+    port.open(usedPorts[0], BAUD_RATE);
+  }
+
+  // create a connect button
+  connectBtn = createButton("Connect to Arduino");
+  connectBtn.position(5, 5); // Position the button in the top left of the screen.
+  connectBtn.mouseClicked(onConnectButtonClicked); // When the button is clicked, run the onConnectButtonClicked function
+}
+
+function checkPort() {
+  if (!port.opened()) {
+    // If the port is not open, change button text
+    connectBtn.html("Connect to Arduino");
+    // Set background to gray
+    background("gray");
+    return false;
+  } else {
+    // Otherwise we are connected
+    connectBtn.html("Disconnect");
+    return true;
+  }
+}
+
+function onConnectButtonClicked() {
+  // When the connect button is clicked
+  if (!port.opened()) {
+    // If the port is not opened, we open it
+    port.open(BAUD_RATE);
+  } else {
+    // Otherwise, we close it!
+    port.close();
+  }
+}
+      </code></pre>
+      <p>In my p5 code, I set up the port so I can run my code. In my draw function, I read the x and y values
+        coming from the serial monitor in arduino. Then I split them into individual values in an array. From there If the values are 
+        a specific value then I programmed the code to perform an action, in this case changing the screen to either red or purple and then sending that back
+        to the ardunio to change the LED color.
+      </p>
+      <h4>My arduino code</h4>
+      <pre><code>
+int xPin = A0; // joystick controller 1
+int yPin = A1; // joystick controller 2
+
+void setup() {
+  pinMode(xPin, INPUT); // initialize x pin of joystick
+  pinMode(yPin, INPUT); // initialize y pin of joystick
+  pinMode(9, OUTPUT); // red LED
+  pinMode(10, OUTPUT); // blue LED
+  pinMode(11, OUTPUT); // green LED
+  Serial.begin(19200);
+  }
+
+void loop() {
+  int xPosition = analogRead(xPin); // read x position of x pin (0-1023)
+  int yPosition = analogRead(yPin); // read y position of x pin (0-1023)
+
+  Serial.print(xPosition);
+  Serial.print(",");
+  Serial.println(yPosition);
+
+  if (xPosition == 0 && xPosition < 510) { // if x is at coordinate 0 and less than 510 (in the up position)
+    analogWrite(9,255); //turn on red
+    digitalWrite(10, HIGH); // turn on blue
+  } else if (xPosition == 1023 && xPosition > 510) { // if x coordinate is at 1023 and more than 510 (in the down position)
+    analogWrite(9,255); // turn on red
+    digitalWrite(10, LOW); // turn off blue
+  } else { // if neither (not being used at all)
+    // turn off all LEDS
+    digitalWrite(9,LOW); 
+    digitalWrite(10, LOW);
+    digitalWrite(11, LOW);
+  }
+
+  delay(200); // delay readings by 0.2 sec
+}
+      </code></pre>
+      <p>In my arduino code, I wrote it so that if the joystick moves up, the red and blue LEDS will turn on, making purple
+        and if the joystick moves down then the red LED will turn on. if the  joystick isn't moving, no LEDS will turn on
+      </p>
+      <h4>My Circut's operation:</h4>
+      <img src="circut_gif_A6.gif" id="images">
+      <p> In my gif, if the joystick is moved in the up direction, the screen will turn purple and show the words, "the joystick
+        is moving up" and the rgb LED will turn on red and blue to make purple." when the joystick is moved down, the screen 
+        will turn red and show the words "the joystick is moving down" and the rgb LED will turn only the red LED on. If the joystick is
+        neither up nor down (neutral) then the the screen will turn white showing nothing and the rgb LED will be fully off.
+      </p>
+    </div>
+  </body>
+</html>
