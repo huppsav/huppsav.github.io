@@ -23,6 +23,11 @@ svg {
   max-width: 100%;
 }
 
+#final_project {
+  height: 550px;
+  width: auto;
+}
+
 body {
   font-family: "Inter", sans-serif;
   line-height: 1.5;
