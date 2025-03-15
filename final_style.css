@@ -1,0 +1,47 @@
+
+h2, h3 {
+    color: #B63178;
+}
+
+h1 {
+    color: white;
+}
+
+p, li, ul {
+ font-size: 15pt;
+}
+
+.final_header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background:#B63178;
+    
+}
+
+#longer-text {
+    width: 800px;
+    font-size: 15pt;
+}
+
+#grid_container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px; 
+    width: 100%;
+    text-align: center;
+}
+
+.grid_item {
+    padding: 20px;
+    border-style: solid;
+    border-color: #B63178;
+}
+
+#title{
+    font-size: 60pt;
+}
+#images, img {
+    height: 350px;
+    width: auto;
+  }
